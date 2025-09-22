@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subscription & Spending Tracker</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+  h1 { text-align: center; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: #fff; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+  th { background: #eee; }
+  input, button { padding: 5px; margin: 5px; }
+  .total { font-weight: bold; font-size: 1.2em; }
+</style>
+</head>
+<body>
+
+<h1>Subscription & Spending Tracker</h1>
+
+<div>
+  <label>Monthly Income (£): </label>
+  <input type="number" id="income" value="303">
+</div>
+
+<h2>Subscriptions</h2>
+<table id="subsTable">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Cost (£)</th>
+      <th>Frequency</th>
+      <th>Notes</th>
+      <th>Priority</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<h2>Add Subscription</h2>
+<div>
+  <input type="text" id="subName" placeholder="Name">
+  <input type="number" id="subCost" placeholder="Cost (£)">
+  <input type="text" id="subFreq" placeholder="Frequency (Monthly)">
+  <input type="text" id="subNotes" placeholder="Notes">
+  <input type="text" id="subPriority" placeholder="Priority">
+  <button onclick="addSubscription()">Add</button>
+</div>
+
+<div class="total">
+  Total Monthly Spend: £<span id="totalSpend">0</span><br>
+  Remaining: £<span id="remaining">0</span>
+</div>
+
+<script>
+let subscriptions = [
+  {name: "iCloud (200GB)", cost: 8.99, frequency: "Monthly", notes: "Cloud storage", priority: "High"},
+  {name: "Gym", cost: 16.99, frequency: "Monthly", notes: "Fitness membership", priority: "Medium"},
+  {name: "Claude Pro", cost: 20, frequency: "Monthly", notes: "AI assistant", priority: "Medium"},
+  {name: "Whoop", cost: 27, frequency: "Monthly", notes: "Sleep tracker", priority: "Medium"},
+  {name: "SIM 1", cost: 10, frequency: "Monthly", notes: "Mobile plan", priority: "High"},
+  {name: "SIM 2", cost: 10, frequency: "Monthly", notes: "Mobile plan", priority: "High"}
+];
+
+function renderTable() {
+  const tbody = document.querySelector("#subsTable tbody");
+  tbody.innerHTML = "";
+  let total = 0;
+  subscriptions.forEach((sub, index) => {
+    total += sub.cost;
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${sub.name}</td>
+      <td>${sub.cost.toFixed(2)}</td>
+      <td>${sub.frequency}</td>
+      <td>${sub.notes}</td>
+      <td>${sub.priority}</td>
+      <td><button onclick="removeSubscription(${index})">Remove</button></td>
+    `;
+    tbody.appendChild(row);
+  });
+  document.getElementById("totalSpend").innerText = total.toFixed(2);
+  const income = parseFloat(document.getElementById("income").value) || 0;
+  document.getElementById("remaining").innerText = (income - total).toFixed(2);
+}
+
+function addSubscription() {
+  const name = document.getElementById("subName").value;
+  const cost = parseFloat(document.getElementById("subCost").value);
+  const frequency = document.getElementById("subFreq").value || "Monthly";
+  const notes = document.getElementById("subNotes").value;
+  const priority = document.getElementById("subPriority").value || "Medium";
+  if (name && !isNaN(cost)) {
+    subscriptions.push({name, cost, frequency, notes, priority});
+    document.getElementById("subName").value = "";
+    document.getElementById("subCost").value = "";
+    document.getElementById("subFreq").value = "";
+    document.getElementById("subNotes").value = "";
+    document.getElementById("subPriority").value = "";
+    renderTable();
+  }
+}
+
+function removeSubscription(index) {
+  subscriptions.splice(index, 1);
+  renderTable();
+}
+
+// Update remaining when income changes
+document.getElementById("income").addEventListener("input", renderTable);
+
+renderTable();
+</script>
+
+</body>
+</html>
